@@ -4,24 +4,7 @@ par Bradley Perreault
 groupe 4567
 """
 
-"""
-notes
 
-20 max hp
-
-every day you either
-
-fight
-
-no fight (penalty)
-
-enemy randomized from dict
-
-win by surviving # of days
-
-
-
-"""
 
 # imports
 
