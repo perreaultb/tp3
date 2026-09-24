@@ -25,13 +25,16 @@ enemies = {
 enemy_hp : int = None
 chosen_enemy : str = None
 enemy_damage : int = None
-
+potion_heal : int = 25
 
 inventory = {
     "hp_potion": 0,
 }
 
 days_skipped : int = 0
+
+crit_chance : float = 0.1
+enemy_crit_chance : float = 0.05
 
 # functions
 
@@ -81,7 +84,7 @@ def dont_fight():
 line1 = "\n"
 line2 = "\n"
 line3 = "\n"
-
+criting = False
 def handle_fight():
     """
     Gère le combat contre un monstre, applique les dégâts et affiche les informations sur le joueur.
@@ -94,6 +97,7 @@ def handle_fight():
     line3 = "\n"
     print(f"Vous avez choisi de combattre le {chosen_enemy} !")
     while enemy_hp > 0 and hp > 0:
+        criting = False
         print("/----------------------------\\")
         print(f"Vous avez {hp} points de vie.")
         print(f"Le {chosen_enemy} a {enemy_hp} points de vie.")
@@ -106,11 +110,20 @@ def handle_fight():
         choice = input().lower()
         if choice == "attaquer":
             player_damage = random.randint(1, 5)
+            if random.random() < crit_chance:
+                player_damage *= 2
+                criting = True
             enemy_hp -= player_damage
             if enemy_hp > 0:
-                line1 = f"Vous infligez {player_damage} points de dégâts au {chosen_enemy}. Il lui reste {enemy_hp} points de vie."
+                if criting:
+                    line1 = f"Vous infligez {player_damage} points de dégâts au {chosen_enemy} (coup critique !). Il lui reste {enemy_hp} points de vie."
+                else:
+                    line1 = f"Vous infligez {player_damage} points de dégâts au {chosen_enemy}. Il lui reste {enemy_hp} points de vie."
             else:
-                line1 = f"Vous infligez {player_damage} points de dégâts au {chosen_enemy}. Il lui reste 0 points de vie!"
+                if criting:
+                    line1 = f"Vous infligez {player_damage} points de dégâts au {chosen_enemy} (coup critique !). Il lui reste 0 points de vie!"
+                else:
+                    line1 = f"Vous infligez {player_damage} points de dégâts au {chosen_enemy}. Il lui reste 0 points de vie!"
             if enemy_hp <= 0:
                 random_loot = random.randint(1, 3)
                 if random_loot == 1:
@@ -133,14 +146,14 @@ def handle_fight():
             
             choice_inv = input().lower()
             if choice_inv == "o" and inventory["hp_potion"] > 0 and not hp == max_hp:
-                if (hp + 5) > hp_max:
-                    hp = hp_max
+                if (hp + potion_heal) > max_hp:
+                    hp = max_hp
                     inventory["hp_potion"] -= 1
-                    print(f"Vous utilisez une potion de vie et récupérez {hp_max - (hp - 5)} points de vie. Il vous reste {hp} points de vie et {inventory['hp_potion']} potions de vie.")
+                    print(f"Vous utilisez une potion de vie et récupérez {max_hp - (hp - potion_heal)} points de vie. Il vous reste {hp} points de vie et {inventory['hp_potion']} potions de vie.")
                 else:
-                    hp += 5
+                    hp += potion_heal
                     inventory["hp_potion"] -= 1
-                    print(f"Vous utilisez une potion de vie et récupérez 5 points de vie. Il vous reste {hp} points de vie et {inventory['hp_potion']} potions de vie.")
+                    print(f"Vous utilisez une potion de vie et récupérez {potion_heal} points de vie. Il vous reste {hp} points de vie et {inventory['hp_potion']} potions de vie.")
             elif choice_inv == "n" and inventory["hp_potion"] > 0 and not hp == max_hp:
                 print("Vous décidez de ne pas utiliser de potion de vie.")
             
